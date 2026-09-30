@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>What Can I Do With This?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    --bg: #eef2ef;
+    --surface: #ffffff;
+    --ink: #16241f;
+    --muted: #5b6b64;
+    --line: #d5ddd8;
+    --keep: #2c58d6;
+    --repurpose: #a92f85;
+    --sell: #b97800;
+    --donate: #1b8555;
+    --tag: #16241f;
+    --tag-ink: #eef2ef;
+    --font: "Bricolage Grotesque", ui-rounded, "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #101a16; --surface: #17251f; --ink: #e8f0ec; --muted: #9db0a7; --line: #2a3b34;
+      --keep: #7d9bff; --repurpose: #ee7fce; --sell: #f0b64a; --donate: #52d69a;
+      --tag: #e8f0ec; --tag-ink: #101a16;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #101a16; --surface: #17251f; --ink: #e8f0ec; --muted: #9db0a7; --line: #2a3b34;
+    --keep: #7d9bff; --repurpose: #ee7fce; --sell: #f0b64a; --donate: #52d69a;
+    --tag: #e8f0ec; --tag-ink: #101a16;
+  }
+  html { height: 100%; scroll-padding-top: env(safe-area-inset-top, 0px); }
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100%;
+    background: var(--bg); color: var(--ink);
+    font-family: var(--font); font-size: 17px; line-height: 1.45;
+    -webkit-text-size-adjust: 100%;
+  }
+  main { max-width: 560px; margin: 0 auto; padding: 22px 18px 48px; }
+
+  h1 { font-size: 2rem; line-height: 1.05; font-weight: 800; letter-spacing: -0.02em; margin: 6px 0 6px; }
+  .sub { color: var(--muted); margin: 0 0 20px; }
+
+  .finder { display: flex; gap: 8px; }
+  .finder input {
+    flex: 1; min-width: 0; font: inherit; font-size: 1.05rem; color: var(--ink);
+    background: var(--surface); border: 2px solid var(--ink); border-radius: 12px;
+    padding: 13px 14px;
+  }
+  .finder input::placeholder { color: var(--muted); }
+  button {
+    font: inherit; cursor: pointer; border: 0; border-radius: 12px;
+    background: var(--tag); color: var(--tag-ink); font-weight: 600; padding: 0 18px;
+  }
+  button:focus-visible, input:focus-visible, textarea:focus-visible, .chip:focus-visible {
+    outline: 3px solid var(--keep); outline-offset: 2px;
+  }
+  .finder button { min-height: 50px; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 6px; }
+  .chip {
+    font-size: .92rem; font-weight: 400; padding: 7px 12px; border-radius: 999px;
+    background: transparent; color: var(--ink); border: 1.5px solid var(--line);
+  }
+  .chip:active { background: var(--surface); }
+
+  #result { margin-top: 22px; }
+  .item-title { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.01em; margin: 0 0 2px; }
+  .hint { color: var(--muted); font-size: .92rem; margin: 0 0 14px; }
+
+  .sec {
+    background: var(--surface); border-radius: 14px; padding: 14px 16px 14px 18px;
+    margin-bottom: 12px; border-left: 8px solid var(--c); border-top: 1px solid var(--line);
+    border-right: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  }
+  .sec h2 { margin: 0 0 6px; font-size: 1.15rem; font-weight: 800; color: var(--c); }
+  .sec ul { margin: 0; padding-left: 1.1rem; }
+  .sec li { margin: 4px 0; }
+  .sec p { margin: 0; }
+  .sec.keep { --c: var(--keep); }
+  .sec.repurpose { --c: var(--repurpose); }
+  .sec.sell { --c: var(--sell); }
+  .sec.donate { --c: var(--donate); }
+  .verdict {
+    display: inline-block; font-weight: 600; font-size: .85rem; padding: 2px 10px;
+    border-radius: 999px; border: 1.5px solid var(--c); color: var(--c); margin-bottom: 6px;
+  }
+
+  .notes { margin-top: 20px; }
+  .notes h2 { font-size: 1.15rem; font-weight: 800; margin: 0 0 8px; }
+  .note {
+    display: flex; gap: 10px; align-items: flex-start; justify-content: space-between;
+    background: var(--surface); border: 1px dashed var(--muted); border-radius: 12px;
+    padding: 10px 12px; margin-bottom: 8px; overflow-wrap: anywhere; white-space: pre-wrap;
+  }
+  .note button {
+    background: transparent; color: var(--muted); padding: 2px 8px; min-height: 32px;
+    font-weight: 400; border: 1.5px solid var(--line); border-radius: 8px; flex: none;
+  }
+  .add { display: flex; gap: 8px; margin-top: 8px; }
+  .add textarea {
+    flex: 1; min-width: 0; font: inherit; color: var(--ink); background: var(--surface);
+    border: 1.5px solid var(--line); border-radius: 12px; padding: 10px 12px; resize: vertical; min-height: 48px;
+  }
+  .add button { min-height: 48px; }
+  .empty { color: var(--muted); margin: 0 0 8px; font-size: .95rem; }
+  .photo-row { margin-top: 10px; }
+  .ghost {
+    background: transparent; color: var(--ink); border: 1.5px solid var(--ink);
+    min-height: 44px; width: 100%;
+  }
+  .pending {
+    display: flex; gap: 12px; align-items: center; margin-top: 10px;
+    background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px; padding: 8px;
+  }
+  .pending img { width: 72px; height: 72px; object-fit: cover; border-radius: 8px; flex: none; }
+  .pending p { margin: 0; flex: 1; font-size: .95rem; }
+  .pending button { background: transparent; color: var(--muted); border: 1.5px solid var(--line);
+    font-weight: 400; min-height: 36px; padding: 0 10px; }
+  .hero { display: block; width: 100%; max-height: 260px; object-fit: cover; border-radius: 14px; margin: 0 0 12px; }
+  .photos { margin-top: 20px; }
+  .photos h2 { font-size: 1.15rem; font-weight: 800; margin: 0 0 8px; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 8px; }
+  .thumb { position: relative; aspect-ratio: 1; }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; display: block; }
+  .thumb button {
+    position: absolute; top: 4px; right: 4px; width: 28px; height: 28px; padding: 0; border-radius: 50%;
+    background: var(--tag); color: var(--tag-ink); font-size: 1rem; line-height: 1;
+  }
+  .settings { margin-top: 24px; background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px; padding: 10px 14px; }
+  .settings summary { cursor: pointer; font-weight: 600; }
+  .settings p { margin: 8px 0; font-size: .92rem; }
+  .settings input {
+    flex: 1; min-width: 0; font: inherit; color: var(--ink); background: var(--bg);
+    border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px;
+  }
+  .settings .add button { min-height: 44px; }
+  .foot { color: var(--muted); font-size: .8rem; margin-top: 28px; }
+  .warn { font-size: .9rem; color: var(--muted); margin-top: 8px; }
+  @media (prefers-reduced-motion: no-preference) {
+    #result > * { animation: pop .18s ease-out; }
+    @keyframes pop { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>What can I do with this?</h1>
+  <p class="sub">Type something you have lying around.</p>
+
+  <div class="finder">
+    <input id="q" type="text" inputmode="text" enterkeyhint="search" autocomplete="off" autocapitalize="none"
+           placeholder="e.g. glass jars" aria-label="Item">
+    <button id="go" type="button">Look up</button>
+  </div>
+  <div class="photo-row">
+    <button id="snap" class="ghost" type="button">Snap a photo</button>
+    <input id="file" type="file" accept="image/*" capture="environment" hidden>
+  </div>
+  <div id="pending" aria-live="polite"></div>
+  <div class="chips" id="chips" aria-label="Quick picks"></div>
+
+  <div id="result" aria-live="polite"></div>
+
+  <details class="settings" id="settings" hidden>
+    <summary>AI settings</summary>
+    <p>Photo recognition and ideas for unlisted items use Claude. Paste your own Anthropic API key to turn it on. It is saved only on this device.</p>
+    <div class="add">
+      <input id="key" type="password" autocomplete="off" autocapitalize="none" placeholder="sk-ant-..." aria-label="Anthropic API key">
+      <button id="savekey" type="button">Save</button>
+    </div>
+    <p id="keystatus" class="warn"></p>
+    <p class="warn">Get a key at console.anthropic.com. Set a low monthly spend limit and don't use this on a shared device.</p>
+    <button id="clearkey" class="ghost" type="button">Remove key</button>
+  </details>
+
+  <p class="foot">Ideas are general guidance. Local rules and prices vary. Photos and ideas for unlisted items are handled by Claude. Your notes and photos stay on this device.</p>
+</main>
+
+<script>
+(function () {
+  // ---------- Built-in database ----------
+  // s = sell verdict: "Worth a try" | "Maybe" | "Unlikely"
+  var DB = [
+    { id:"old-clothes", name:"Old clothes", words:"clothes clothing shirts pants jeans jackets sweaters dress dresses apparel t-shirts tshirts",
+      keep:["Sort into keep, fix, and let go piles. Keep what you wore in the last year.","Set aside a few worn-out pieces for painting and yard work.","Store seasonal items in labeled bins."],
+      repurpose:["Cut into cleaning rags.","Turn t-shirts into tote bags or braided rugs.","Use fabric scraps for patches, stuffing, or pet bedding."],
+      sell:{s:"Worth a try",t:"Good-condition brands and denim can sell on resale apps or consignment shops. Worn basics usually aren't worth the effort."},
+      donate:["Donate clean, wearable items to a thrift store or shelter.","Textile recycling bins take worn or torn fabric.","Check for local clothing drives."] },
+    { id:"old-towels", name:"Old towels and bedding", words:"towels bedding sheets blankets pillows linens comforter blanket",
+      keep:["Keep a couple of old towels for the car, beach, or messy jobs.","Keep spare sheets for guests."],
+      repurpose:["Cut into cleaning cloths.","Use as pet bedding or under a leaky pipe.","Cover furniture while painting."],
+      sell:{s:"Unlikely",t:"Used linens rarely sell. Nice quilts or vintage blankets might."},
+      donate:["Animal shelters and vet clinics often accept old towels and blankets. Call first.","Textile recycling for the rest."] },
+    { id:"cardboard", name:"Cardboard", words:"cardboard boxes box shipping boxes packaging carton cartons",
+      keep:["Keep a few sturdy boxes for moving, storage, or shipping.","Flatten and stack the rest."],
+      repurpose:["Drawer dividers and closet organizers.","Weed barrier under mulch in the garden.","Kids' forts, costumes, and craft projects.","Compost it as brown material (remove tape)."],
+      sell:{s:"Unlikely",t:"Plain boxes aren't worth selling. Try a local buy-nothing group if you have good moving boxes."},
+      donate:["Curbside recycling: flatten and keep it dry.","Offer moving boxes to neighbors or online free groups."] },
+    { id:"paper", name:"Paper and magazines", words:"paper magazines newspapers newspaper junk mail mail documents printer paper catalogs",
+      keep:["Keep tax and important records. Scan the rest if you can.","Save a few sheets of scrap paper for notes."],
+      repurpose:["Use blank sides as scratch paper.","Wrap gifts or line drawers.","Shred and add to compost or use as packing material."],
+      sell:{s:"Unlikely",t:"Only vintage or collectible magazines have value."},
+      donate:["Curbside paper recycling.","Schools and libraries sometimes take magazines for crafts.","Shred sensitive documents before recycling."] },
+    { id:"books", name:"Books", words:"books book novels textbooks paperbacks hardcovers",
+      keep:["Keep favorites and reference books.","Store upright, away from damp and sunlight."],
+      repurpose:["Use damaged books for paper crafts and decor.","Stack as a small riser or side table."],
+      sell:{s:"Maybe",t:"Recent textbooks and rare or collectible titles can sell online or to used bookstores. Most paperbacks earn very little."},
+      donate:["Libraries, schools, and thrift stores.","Little free libraries.","Paper recycling for damaged books (remove hard covers if required)."] },
+    { id:"glass-jars", name:"Glass jars", words:"jars jar glass bottles bottle mason jars mason wine bottles glass containers",
+      keep:["Keep a few in different sizes for leftovers and dry goods.","Wash and store with lids on."],
+      repurpose:["Pantry storage for grains, spices, and snacks.","Candle holders or vases.","Organize screws, buttons, and craft supplies.","Drinking glasses or overnight oats containers."],
+      sell:{s:"Unlikely",t:"Standard jars don't sell. Canning jars in sets or vintage glass can go for a bit."},
+      donate:["Give clean jars to people who can or craft.","Curbside glass recycling. Rinse and remove lids.","Some areas have glass drop-off points."] },
+    { id:"plastic-containers", name:"Plastic containers", words:"plastic containers tupperware takeout containers tubs yogurt tubs bottles plastic bottles food containers lids",
+      keep:["Keep matching sets with lids. Toss the ones without.","Avoid heating old or scratched plastic."],
+      repurpose:["Organize small items in drawers and garages.","Seed starters or plant saucers.","Paint trays and craft cups."],
+      sell:{s:"Unlikely",t:"Not worth selling."},
+      donate:["Check recycling number and local rules before recycling.","Schools, daycares, and craft groups may want clean tubs."] },
+    { id:"plastic-bags", name:"Plastic bags", words:"plastic bags bags grocery bags shopping bags",
+      keep:["Keep a few for trash liners or messy items."],
+      repurpose:["Line small trash cans.","Pack shoes or wet items when traveling.","Use as packing padding."],
+      sell:{s:"Unlikely",t:"No resale value."},
+      donate:["Many grocery stores collect clean plastic bags for recycling.","Do not put them in curbside bins unless your area says so."] },
+    { id:"tin-cans", name:"Tin and metal cans", words:"cans tin cans metal cans aluminum cans soda cans food cans steel",
+      keep:["Save a few clean cans for organizing."],
+      repurpose:["Pencil holders and desk organizers.","Herb planters (drill a drainage hole).","Lanterns and candle holders."],
+      sell:{s:"Maybe",t:"Scrap metal yards pay a little by weight if you have a lot of aluminum or steel."},
+      donate:["Rinse and put in curbside recycling.","Some areas have deposit refunds on beverage cans."] },
+    { id:"broken-electronics", name:"Broken electronics", words:"electronics electronic broken electronics tv television laptop computer monitor printer speaker speakers appliance gadgets ewaste e-waste",
+      keep:["Keep it only if you plan to repair it soon. Set a deadline.","Wipe personal data from anything that stores it before moving on."],
+      repurpose:["Salvage screws, cables, and small parts.","Use an old monitor or screen as a secondary display if it works.","Strip working parts for hobby projects."],
+      sell:{s:"Maybe",t:"Sell for parts or repair. Listings marked \"for parts, not working\" get bids, especially laptops, consoles, and phones."},
+      donate:["Never put in regular trash. Use e-waste recycling events or drop-off sites.","Manufacturer and retailer take-back programs.","Repair cafes may fix it or take it for parts."] },
+    { id:"old-phones", name:"Old phones and tablets", words:"phone phones cell phone smartphone iphone android tablet ipad old phone",
+      keep:["Turn one into a dedicated music player, alarm clock, or camera."],
+      repurpose:["Baby monitor, security camera, or smart home remote.","Kid-safe device with parental controls."],
+      sell:{s:"Worth a try",t:"Working phones and tablets usually have trade-in or resale value. Factory reset first."},
+      donate:["Trade-in programs from carriers and manufacturers.","Some charities refurbish phones. Wipe them first.","E-waste recycling if it's dead."] },
+    { id:"cables", name:"Cables and chargers", words:"cables cords chargers charger wires cable cord usb adapters power cords",
+      keep:["Keep the ones that match devices you still use.","Bundle and label the rest in a pouch."],
+      repurpose:["Cable ties or craft wire from old cords (unplugged and cut safely).","Keep one spare charger in the car or bag."],
+      sell:{s:"Unlikely",t:"Only brand-name or specialty cables have value."},
+      donate:["E-waste recycling.","Some schools and makerspaces take working cables."] },
+    { id:"batteries", name:"Batteries", words:"batteries battery aa aaa lithium rechargeable button cell",
+      keep:["Store unused ones in a cool, dry place. Tape the ends of lithium batteries."],
+      repurpose:["Test used ones. Some still have charge for remotes and clocks."],
+      sell:{s:"Unlikely",t:"Not worth selling."},
+      donate:["Do not put in regular trash. Use battery drop-off at many hardware and electronics stores.","Household hazardous waste events take all types."] },
+    { id:"light-bulbs", name:"Light bulbs", words:"light bulbs bulbs bulb lightbulb lightbulbs cfl led fluorescent lamps",
+      keep:["Keep a couple of spares in common sizes."],
+      repurpose:["Burned-out ones can become small vases or craft pieces. Handle with care."],
+      sell:{s:"Unlikely",t:"Not worth selling."},
+      donate:["CFL and fluorescent bulbs contain mercury. Take to a hardware store or hazardous waste site.","LED bulbs: check local e-waste rules."] },
+    { id:"extra-paint", name:"Extra paint", words:"paint paints leftover paint cans stain varnish primer",
+      keep:["Keep a small labeled jar of each color for touch-ups.","Store sealed, upside down, away from freezing."],
+      repurpose:["Paint furniture, planters, or a garage wall.","Use as primer or a base coat for craft projects.","Mix leftovers into one neutral color."],
+      sell:{s:"Maybe",t:"Unopened cans of good paint can sell locally. Partial cans rarely sell."},
+      donate:["Habitat for Humanity ReStores, theaters, and schools may take usable paint.","Never pour paint down drains. Use a hazardous waste site for liquid paint.","Dry it out with kitty litter, then follow local trash rules."] },
+    { id:"old-furniture", name:"Old furniture", words:"furniture chair chairs table tables couch sofa dresser desk shelf shelves bookcase bed frame cabinet nightstand",
+      keep:["Keep it if it's solid wood or well made. Repair beats replace.","Use it in a different room."],
+      repurpose:["Repaint or refinish.","Turn a dresser into a bathroom vanity or a table into a desk.","Salvage hardware and wood."],
+      sell:{s:"Worth a try",t:"Solid wood, mid-century, and name-brand pieces can sell well locally. Take clear photos and price honestly."},
+      donate:["Habitat for Humanity ReStore, thrift stores, and shelters. Some offer free pickup.","Free listings online.","Bulk pickup for broken pieces."] },
+    { id:"mattress", name:"Mattress", words:"mattress mattresses box spring bed",
+      keep:["Keep it only for guests if it's still clean and supportive."],
+      repurpose:["Salvage springs and foam for projects."],
+      sell:{s:"Unlikely",t:"Used mattresses rarely sell and many places won't accept them."},
+      donate:["Some cities and retailers offer mattress recycling.","Ask about haul-away when you buy a new one.","Charities usually don't take used mattresses."] },
+    { id:"tools", name:"Old tools", words:"tools tool hammer drill drills saw wrench screwdriver power tools hand tools toolbox",
+      keep:["Keep basic hand tools you'll use.","Oil metal parts to prevent rust."],
+      repurpose:["Rusty tools can be cleaned up or used for decor.","Old handles can become hooks."],
+      sell:{s:"Worth a try",t:"Working power tools and vintage hand tools sell well. Clean them and list with brand and model."},
+      donate:["Makerspaces, trade schools, and community workshops.","Habitat for Humanity ReStore."] },
+    { id:"toys", name:"Toys", words:"toys toy kids toys games board games stuffed animals stuffed puzzles lego",
+      keep:["Keep favorites and things with sentimental value.","Rotate toys out of sight to keep them fresh."],
+      repurpose:["Use spare parts for crafts.","Turn stuffed animals into pillows or donations."],
+      sell:{s:"Maybe",t:"Complete sets, Lego, and name-brand toys can sell. Check for missing pieces first."},
+      donate:["Daycares, shelters, and thrift stores. Clean them and check for safety recalls.","Toy swap groups."] },
+    { id:"dishes", name:"Dishes and kitchenware", words:"dishes plates bowls cups mugs kitchenware kitchen pots pans cookware utensils glasses silverware",
+      keep:["Keep a small backup set for guests.","Keep pots and pans you actually use."],
+      repurpose:["Mugs as planters or pen holders.","Chipped plates as plant saucers.","Broken ceramic as garden drainage or mosaic pieces."],
+      sell:{s:"Maybe",t:"Cast iron, vintage sets, and name-brand cookware can sell well. Everyday mismatched dishes rarely do."},
+      donate:["Thrift stores, shelters, and people setting up their first home.","Scrap yards for old metal pans."] },
+    { id:"shoes", name:"Shoes", words:"shoes shoe sneakers boots sandals heels footwear",
+      keep:["Keep a pair for messy jobs.","Get worn shoes resoled instead of replacing them."],
+      repurpose:["Old sneakers for gardening or painting.","Planters from worn boots."],
+      sell:{s:"Maybe",t:"Clean, name-brand or lightly worn shoes can sell online. Worn-out pairs won't."},
+      donate:["Donate wearable pairs.","Some brands and stores have shoe recycling programs."] },
+    { id:"wood", name:"Wood scraps and pallets", words:"wood scrap wood pallets pallet lumber boards planks timber",
+      keep:["Keep straight, usable pieces for projects.","Store flat and dry."],
+      repurpose:["Shelves, planters, and garden beds.","Kindling (untreated wood only).","Small crafts and frames."],
+      sell:{s:"Maybe",t:"Hardwood, reclaimed wood, and clean pallets can sell locally."},
+      donate:["Makerspaces, schools, and community gardens.","Don't burn painted or treated wood."] },
+    { id:"bikes", name:"Old bikes", words:"bike bikes bicycle bicycles cycle",
+      keep:["Keep it if a tune-up gets it working again."],
+      repurpose:["Use parts like chains, gears, and wheels for projects.","Turn a wheel into decor or a planter."],
+      sell:{s:"Worth a try",t:"Working bikes sell easily. Even non-working ones can sell for parts."},
+      donate:["Community bike shops and youth programs often refurbish donated bikes.","Scrap metal if it's beyond saving."] },
+    { id:"frames", name:"Picture frames", words:"frames frame picture frames photo frames pictures art artwork",
+      keep:["Keep frames that fit photos or art you already have."],
+      repurpose:["Turn into a serving tray, jewelry holder, or key organizer.","Use the glass as a dry-erase board."],
+      sell:{s:"Maybe",t:"Solid wood and vintage frames can sell. Basic ones rarely do."},
+      donate:["Thrift stores and art programs.","Recycle the glass and metal parts separately."] },
+    { id:"candles", name:"Old candles", words:"candles candle wax leftover candles",
+      keep:["Keep half-used candles for power outages."],
+      repurpose:["Melt leftover wax into new candles.","Rub wax on sticky drawers and zippers.","Use jars as pen holders after cleaning."],
+      sell:{s:"Unlikely",t:"Used candles don't sell."},
+      donate:["Donate unburned ones.","Wash jars and recycle glass."] },
+    { id:"cds", name:"CDs and DVDs", words:"cds cd dvds dvd discs disc blu-ray bluray records vinyl",
+      keep:["Rip your favorites to digital first."],
+      repurpose:["Coasters, mosaics, or garden bird deterrents."],
+      sell:{s:"Maybe",t:"Rare discs and vinyl can sell. Most CDs and DVDs go for very little."},
+      donate:["Libraries and thrift stores.","Mail-in recycling programs for discs."] },
+    { id:"tires", name:"Tires", words:"tires tire tyre tyres wheels rubber",
+      keep:["Keep a spare only if it's the right size and not cracked."],
+      repurpose:["Planters, playground swings, or garden borders."],
+      sell:{s:"Maybe",t:"Tires with plenty of tread can sell. Check age and damage first."},
+      donate:["Tire shops accept old tires for a small fee.","Don't dump or burn them."] },
+    { id:"plants", name:"Yard waste and plants", words:"plants plant leaves branches yard waste garden clippings grass mulch dirt soil",
+      keep:["Keep healthy plants and cuttings to grow more."],
+      repurpose:["Compost clippings and leaves.","Use branches as garden stakes or edging."],
+      sell:{s:"Maybe",t:"Cuttings and healthy plants can sell or trade locally."},
+      donate:["Plant swaps and community gardens.","Curbside yard waste collection."] }
+  ];
+
+  var GENERIC = {
+    keep:["Ask if you've used it in the past year. If not, it may be clutter.","If you keep it, give it a labeled home so it doesn't pile up.","Take a photo of sentimental items, then decide."],
+    repurpose:["Look for a second use as storage, a planter, or craft material.","Search for ideas by material, like wood, glass, metal, or fabric.","Break it into parts and reuse what still works."],
+    sell:{s:"Maybe",t:"Check recent sold listings on resale sites to see what similar items actually sell for. If it earns less than the effort, give it away."},
+    donate:["Thrift stores, shelters, and buy-nothing groups take good-condition items.","Call your local waste service for recycling and hazardous waste rules.","Don't put batteries, paint, or electronics in the regular trash."]
+  };
+
+  // ---------- Storage (local, safe) ----------
+  var KEY = "wcidwt.notes.v1";
+  var mem = {};
+  function loadNotes() {
+    try { var raw = localStorage.getItem(KEY); if (raw) return JSON.parse(raw) || {}; } catch (e) {}
+    return mem;
+  }
+  function saveNotes(all) {
+    mem = all;
+    try { localStorage.setItem(KEY, JSON.stringify(all)); } catch (e) {}
+  }
+
+  var PKEY = "wcidwt.photos.v1";
+  var pmem = {};
+  function loadPhotos() {
+    try { var raw = localStorage.getItem(PKEY); if (raw) return JSON.parse(raw) || {}; } catch (e) {}
+    return pmem;
+  }
+  function savePhotos(all) {
+    pmem = all;
+    try { localStorage.setItem(PKEY, JSON.stringify(all)); return true; } catch (e) { return false; }
+  }
+  // Shrink to ~640px JPEG so photos stay small enough to store and to send to Claude
+  function shrink(file) {
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(file);
+      var img = new Image();
+      img.onload = function () {
+        var r = Math.min(1, 640 / Math.max(img.width, img.height));
+        var c = document.createElement("canvas");
+        c.width = Math.round(img.width * r); c.height = Math.round(img.height * r);
+        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url);
+        var data = c.toDataURL("image/jpeg", 0.72);
+        if (c.toBlob) {
+          c.toBlob(function (blob) { resolve({ data: data, blob: blob }); }, "image/jpeg", 0.72);
+        } else { resolve({ data: data, blob: null }); }
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); reject(); };
+      img.src = url;
+    });
+  }
+
+  // ---------- Matching ----------
+  function norm(s) { return String(s || "").toLowerCase().replace(/[^a-z0-9\s-]/g, " ").replace(/\s+/g, " ").trim(); }
+  function stem(w) {
+    if (w.length > 4 && /ies$/.test(w)) return w.slice(0, -3) + "y";
+    if (w.length > 3 && /(ches|shes|xes|ses)$/.test(w)) return w.slice(0, -2);
+    if (w.length > 3 && /s$/.test(w) && !/ss$/.test(w)) return w.slice(0, -1);
+    return w;
+  }
+  function tokens(s) { return norm(s).split(" ").filter(Boolean).map(stem); }
+  var STOP = { old:1, used:1, broken:0, extra:0, the:1, a:1, an:1, my:1, some:1, of:1, and:1, leftover:0 };
+
+  DB.forEach(function (it) {
+    it._words = tokens(it.words + " " + it.name);
+    it._name = norm(it.name);
+  });
+
+  function find(q) {
+    var n = norm(q);
+    if (!n) return null;
+    var qt = tokens(n).filter(function (w) { return !STOP[w]; });
+    if (!qt.length) qt = tokens(n);
+    var best = null, bestScore = 0;
+    DB.forEach(function (it) {
+      var score = 0;
+      if (it._name === n) score += 100;
+      if (norm(it.words).indexOf(n) !== -1 || it._name.indexOf(n) !== -1) score += 20;
+      qt.forEach(function (t) {
+        if (it._words.indexOf(t) !== -1) score += 10;
+        else if (t.length > 3) {
+          for (var i = 0; i < it._words.length; i++) {
+            if (it._words[i].indexOf(t) === 0 || (it._words[i].length > 4 && t.indexOf(it._words[i]) === 0)) { score += 4; break; }
+          }
+        }
+      });
+      if (score > bestScore) { bestScore = score; best = it; }
+    });
+    return bestScore >= 4 ? best : null;
+  }
+
+  // ---------- Rendering ----------
+  var $q = document.getElementById("q");
+  var $go = document.getElementById("go");
+  var $chips = document.getElementById("chips");
+  var $res = document.getElementById("result");
+
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  function listSection(cls, title, arr) {
+    var s = el("section", "sec " + cls);
+    s.appendChild(el("h2", null, title));
+    var ul = el("ul");
+    arr.forEach(function (t) { ul.appendChild(el("li", null, t)); });
+    s.appendChild(ul);
+    return s;
+  }
+  function sellSection(sell) {
+    var s = el("section", "sec sell");
+    s.appendChild(el("h2", null, "Sell"));
+    s.appendChild(el("span", "verdict", sell.s));
+    s.appendChild(el("p", null, sell.t));
+    return s;
+  }
+
+  // ---------- Claude (optional, lights up only where available) ----------
+  var ai = null, aiImages = false, seq = 0, viaClaude = false;
+  var IDS = DB.map(function (d) { return d.id + " (" + d.name + ")"; }).join(", ");
+
+  // Direct mode: call the Anthropic API from the browser with the person's own key
+  var KEYK = "wcidwt.key.v1";
+  function getKey() { try { return localStorage.getItem(KEYK) || ""; } catch (e) { return ""; } }
+  function blobToB64(blob) {
+    return new Promise(function (res, rej) {
+      var r = new FileReader();
+      r.onload = function () { res(String(r.result).split(",")[1]); };
+      r.onerror = rej;
+      r.readAsDataURL(blob);
+    });
+  }
+  function parseJSON(t) {
+    try { return JSON.parse(t); } catch (e) {}
+    var m = t.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (m) { try { return JSON.parse(m[1]); } catch (e) {} }
+    var a = t.indexOf("{"), b = t.lastIndexOf("}");
+    if (a > -1 && b > a) { try { return JSON.parse(t.slice(a, b + 1)); } catch (e) {} }
+    throw { code: "invalid_json" };
+  }
+  var direct = {
+    json: function (prompt, opts) {
+      var key = getKey();
+      if (!key) return Promise.reject({ code: "not_granted" });
+      var imgP = opts && opts.images ? blobToB64(opts.images) : Promise.resolve(null);
+      return imgP.then(function (b64) {
+        var content = [];
+        if (b64) content.push({ type: "image", source: { type: "base64", media_type: "image/jpeg", data: b64 } });
+        content.push({ type: "text", text: prompt });
+        return fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "x-api-key": key,
+            "anthropic-version": "2023-06-01",
+            "anthropic-dangerous-direct-browser-access": "true"
+          },
+          body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: 800, messages: [{ role: "user", content: content }] })
+        });
+      }).then(function (r) {
+        if (r.status === 401 || r.status === 403) throw { code: "bad_key" };
+        if (r.status === 429) throw { code: "rate_limited" };
+        if (!r.ok) throw { code: "upstream_error" };
+        return r.json();
+      }).then(function (d) {
+        var t = (d.content || []).map(function (c) { return c.text || ""; }).join("");
+        return parseJSON(t);
+      });
+    }
+  };
+
+  var $set = document.getElementById("settings");
+  var $key = document.getElementById("key");
+  var $keystatus = document.getElementById("keystatus");
+  function refreshKeyStatus() {
+    $keystatus.textContent = getKey() ? "A key is saved on this device. AI is on." : "No key saved. AI is off.";
+  }
+  function showSettings() { $set.hidden = false; refreshKeyStatus(); }
+  function useDirect() {
+    if (ai || !getKey()) return;
+    ai = direct; aiImages = true; viaClaude = false;
+    $snap.textContent = "Snap a photo to identify it";
+  }
+  document.getElementById("savekey").onclick = function () {
+    var k = $key.value.trim();
+    if (!k) return;
+    try { localStorage.setItem(KEYK, k); } catch (e) { $keystatus.textContent = "Couldn't save the key on this device."; return; }
+    $key.value = "";
+    useDirect();
+    refreshKeyStatus();
+  };
+  document.getElementById("clearkey").onclick = function () {
+    try { localStorage.removeItem(KEYK); } catch (e) {}
+    if (ai === direct) { ai = null; aiImages = false; $snap.textContent = "Snap a photo"; }
+    refreshKeyStatus();
+  };
+
+  function initAI() {
+    if (window.claude && window.claude.use) {
+      window.claude.use("sample").then(function (s) {
+        if (!s) { useDirect(); showSettings(); return; }
+        ai = s; viaClaude = true;
+        return s.limits().then(function (l) {
+          aiImages = !!(l && l.images);
+          if (aiImages) $snap.textContent = "Snap a photo to identify it";
+        }, function () {});
+      }, function () { useDirect(); showSettings(); });
+    } else {
+      useDirect(); showSettings();
+    }
+  }
+  var HARD = { not_granted:1, sampling_disabled:1, not_declared:1, capability_disabled:1, capability_removed:1 };
+  function aiError(e) {
+    var c = e && e.code;
+    if (c === "images_unavailable") { aiImages = false; $snap.textContent = "Snap a photo"; }
+    else if (HARD[c]) { ai = null; aiImages = false; $snap.textContent = "Snap a photo"; viaClaude = false; useDirect(); showSettings(); }
+    if (c === "bad_key") return "Your API key was rejected. Check it in AI settings.";
+    if (c === "rate_limited") return "Claude is busy or you've hit a usage limit. Try again in a bit.";
+    if (c === "image_rejected") return "That photo couldn't be used. Try another one.";
+    if (c === "cancelled") return "";
+    return "Couldn't reach Claude right now.";
+  }
+  function strs(a, n) {
+    return (Array.isArray(a) ? a : []).map(function (x) { return String(x).trim(); }).filter(Boolean).slice(0, n);
+  }
+  function cleanIdeas(r) {
+    var out = { keep: strs(r && r.keep, 4), repurpose: strs(r && r.repurpose, 5),
+      donate: strs(r && r.donate, 4), sell: null };
+    var s = r && r.sell || {};
+    var v = ["Worth a try", "Maybe", "Unlikely"].indexOf(s.s) !== -1 ? s.s : "Maybe";
+    out.sell = { s: v, t: String(s.t || "").trim() };
+    if (!out.keep.length || !out.repurpose.length || !out.donate.length || !out.sell.t) throw { code: "invalid_json" };
+    return out;
+  }
+  function askIdeas(name) {
+    var prompt = "Someone has this household item and wants to know what to do with it: \"" + name + "\".\n" +
+      "Give practical, safe, plain advice for a US household. Mention hazardous-waste rules if the item is hazardous (batteries, paint, chemicals, electronics, bulbs).\n" +
+      "Reply with only JSON in exactly this shape:\n" +
+      "{\"keep\":[2-3 short strings],\"repurpose\":[3-4 short strings],\"sell\":{\"s\":\"Worth a try\" or \"Maybe\" or \"Unlikely\",\"t\":\"1-2 sentences on whether it could reasonably sell\"},\"donate\":[2-3 short strings on donating, recycling, or disposal]}";
+    var opts = { modelTier: "quick" };
+    if (pendingBlob && aiImages) opts.images = pendingBlob;
+    return ai.json(prompt, opts).then(cleanIdeas);
+  }
+  function identify() {
+    if (!ai || !aiImages || !pendingBlob) return;
+    var mine = ++seq;
+    pendingStatus = "identifying"; drawPending();
+    var prompt = "This is a photo of a household item someone wants to keep, reuse, sell, or get rid of.\n" +
+      "Reply with only JSON: {\"name\":\"plain name of the main item, 1-4 words, lowercase, e.g. glass jars\",\"match\":\"an id from the list below, or null\"}.\n" +
+      "Use a match only if that category clearly fits the item. If the photo shows no clear item, use name \"\" and match null.\n" +
+      "Categories: " + IDS + ".";
+    ai.json(prompt, { images: pendingBlob, modelTier: "quick" }).then(function (r) {
+      if (mine !== seq) return;
+      var name = String(r && r.name || "").trim();
+      if (!name) throw { code: "no_item" };
+      var m = DB.filter(function (d) { return d.id === (r && r.match); })[0] || null;
+      $q.value = name;
+      show(name, m);
+    }).catch(function (e) {
+      if (mine !== seq) return;
+      pendingStatus = "failed"; pendingMsg = e && e.code === "no_item" ? "" : aiError(e);
+      drawPending();
+    });
+  }
+
+  function render(o) {
+    // o: { q, title, data, noteKey, hint }
+    var heroSrc = null, photoFail = false;
+    if (pending) {
+      var allP = loadPhotos();
+      (allP[o.noteKey] = allP[o.noteKey] || []).push(pending);
+      if (savePhotos(allP)) { heroSrc = pending; pending = null; pendingBlob = null; drawPending(); }
+      else { allP[o.noteKey].pop(); photoFail = true; }
+    }
+    $res.innerHTML = "";
+    $res.appendChild(el("h2", "item-title", o.title));
+    if (heroSrc) { var hero = el("img", "hero"); hero.src = heroSrc; hero.alt = "Your photo of " + o.title; $res.appendChild(hero); }
+    $res.appendChild(el("p", "hint", o.hint + (photoFail ? " Your photo couldn't be saved because device storage is full." : "")));
+    $res.appendChild(listSection("keep", "Keep", o.data.keep));
+    $res.appendChild(listSection("repurpose", "Repurpose", o.data.repurpose));
+    $res.appendChild(sellSection(o.data.sell));
+    $res.appendChild(listSection("donate", "Donate / Recycle", o.data.donate));
+    $res.appendChild(notesBlock(o.noteKey));
+    $res.appendChild(photosBlock(o.noteKey));
+    $res.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function show(query, forced) {
+    var q = (query || "").trim();
+    if (!q) { $q.focus(); return; }
+    var mine = ++seq;
+    var it = forced || find(q);
+    var title = it ? it.name : q.charAt(0).toUpperCase() + q.slice(1);
+    if (it) {
+      var hint = forced ? "Claude spotted this in your photo. Here are some ideas."
+        : (norm(q) === it._name ? "Here are some ideas." : "Closest match for \"" + q + "\".");
+      render({ q: q, title: title, data: it, noteKey: it.id, hint: hint });
+      return;
+    }
+    var key = "custom:" + norm(q);
+    if (!ai) {
+      render({ q: q, title: title, data: GENERIC, noteKey: key,
+        hint: "Not in the built-in list yet, so here is general advice. Add your own notes below." });
+      return;
+    }
+    $res.innerHTML = "";
+    $res.appendChild(el("h2", "item-title", title));
+    $res.appendChild(el("p", "hint", "Not in the built-in list. Asking Claude for ideas..."));
+    $res.scrollIntoView({ behavior: "smooth", block: "start" });
+    askIdeas(q).then(function (data) {
+      if (mine !== seq) return;
+      render({ q: q, title: title, data: data, noteKey: key, hint: "Ideas from Claude. Add your own notes below." });
+    }).catch(function (e) {
+      if (mine !== seq) return;
+      var msg = aiError(e);
+      render({ q: q, title: title, data: GENERIC, noteKey: key,
+        hint: (msg ? msg + " " : "") + "Here is general advice instead." });
+    });
+  }
+
+  function notesBlock(key) {
+    var wrap = el("section", "notes");
+    wrap.appendChild(el("h2", null, "My notes"));
+    var list = el("div");
+    var input = el("textarea");
+    input.placeholder = "Add a note, like \"Ask Sam if she wants these\"";
+    input.setAttribute("aria-label", "New note");
+    input.rows = 2;
+    var add = el("button", null, "Add");
+    add.type = "button";
+
+    function draw() {
+      list.innerHTML = "";
+      var notes = loadNotes()[key] || [];
+      if (!notes.length) list.appendChild(el("p", "empty", "No notes yet."));
+      notes.forEach(function (n, i) {
+        var row = el("div", "note");
+        row.appendChild(el("span", null, n));
+        var del = el("button", null, "Delete");
+        del.type = "button";
+        del.setAttribute("aria-label", "Delete note");
+        del.onclick = function () {
+          var all = loadNotes();
+          (all[key] || []).splice(i, 1);
+          if (!all[key].length) delete all[key];
+          saveNotes(all);
+          draw();
+        };
+        row.appendChild(del);
+        list.appendChild(row);
+      });
+    }
+    function submit() {
+      var t = input.value.trim();
+      if (!t) return;
+      var all = loadNotes();
+      (all[key] = all[key] || []).push(t);
+      saveNotes(all);
+      input.value = "";
+      draw();
+    }
+    add.onclick = submit;
+    var row = el("div", "add");
+    row.appendChild(input); row.appendChild(add);
+    wrap.appendChild(list); wrap.appendChild(row);
+    draw();
+    return wrap;
+  }
+
+  // ---------- Photos ----------
+  var $snap = document.getElementById("snap");
+  var $file = document.getElementById("file");
+  var $pending = document.getElementById("pending");
+  var pending = null;      // photo waiting for an item name
+  var pendingBlob = null;  // same photo as a Blob, for Claude
+  var pendingStatus = "manual"; // "identifying" | "manual" | "failed"
+  var pendingMsg = "";
+  var photoTarget = null;  // callback when adding straight to an item
+
+  function drawPending() {
+    $pending.innerHTML = "";
+    if (!pending) return;
+    var box = el("div", "pending");
+    var img = el("img"); img.src = pending; img.alt = "Your photo";
+    box.appendChild(img);
+    var msg = pendingStatus === "identifying" ? "Looking at your photo..."
+      : pendingStatus === "failed" ? ((pendingMsg ? pendingMsg + " " : "Couldn't tell what that is. ") + "Type it above and tap Look up.")
+      : "Got it. Now type what it is above and tap Look up.";
+    box.appendChild(el("p", null, msg));
+    var rm = el("button", null, "Remove"); rm.type = "button";
+    rm.onclick = function () { seq++; pending = null; pendingBlob = null; drawPending(); };
+    box.appendChild(rm);
+    $pending.appendChild(box);
+  }
+
+  function photosBlock(key) {
+    var wrap = el("section", "photos");
+    wrap.appendChild(el("h2", null, "My photos"));
+    var grid = el("div", "grid");
+    var empty = el("p", "empty", "No photos yet.");
+    var add = el("button", "ghost", "Add a photo"); add.type = "button";
+    function draw() {
+      grid.innerHTML = "";
+      var list = loadPhotos()[key] || [];
+      empty.style.display = list.length ? "none" : "";
+      list.forEach(function (src, i) {
+        var t = el("div", "thumb");
+        var im = el("img"); im.src = src; im.alt = "Saved photo " + (i + 1);
+        var d = el("button", null, "\u00d7"); d.type = "button"; d.setAttribute("aria-label", "Delete photo");
+        d.onclick = function () {
+          var all = loadPhotos(); (all[key] || []).splice(i, 1);
+          if (!all[key].length) delete all[key];
+          savePhotos(all); draw();
+        };
+        t.appendChild(im); t.appendChild(d); grid.appendChild(t);
+      });
+    }
+    add.onclick = function () {
+      photoTarget = function (dataUrl) {
+        var all = loadPhotos(); (all[key] = all[key] || []).push(dataUrl);
+        if (!savePhotos(all)) { all[key].pop(); empty.style.display = ""; empty.textContent = "Couldn't save. Device storage is full."; return; }
+        draw();
+      };
+      $file.click();
+    };
+    wrap.appendChild(empty); wrap.appendChild(grid); wrap.appendChild(add);
+    draw();
+    return wrap;
+  }
+
+  $snap.onclick = function () { photoTarget = null; $file.click(); };
+  $file.addEventListener("change", function () {
+    var f = $file.files && $file.files[0];
+    $file.value = "";
+    if (!f) return;
+    shrink(f).then(function (p) {
+      if (photoTarget) { var cb = photoTarget; photoTarget = null; cb(p.data); }
+      else {
+        pending = p.data; pendingBlob = p.blob;
+        pendingStatus = "manual"; pendingMsg = "";
+        drawPending();
+        if (ai && aiImages && pendingBlob) identify();
+        else $q.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }, function () {
+      $pending.innerHTML = "";
+      $pending.appendChild(el("p", "empty", "That photo couldn't be read. Try another."));
+    });
+  });
+
+  // Quick-pick chips
+  ["Old clothes", "Cardboard", "Broken electronics", "Glass jars", "Extra paint", "Old furniture"].forEach(function (t) {
+    var b = el("button", "chip", t);
+    b.type = "button";
+    b.onclick = function () { $q.value = t; show(t); };
+    $chips.appendChild(b);
+  });
+
+  $go.onclick = function () { show($q.value); };
+  $q.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); show($q.value); $q.blur(); } });
+  initAI();
+})();
+</script>
+</body>
+</html>
